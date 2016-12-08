@@ -72,7 +72,7 @@ The `auth_response` object will contain a `user` token and a `bot` token. Let's 
 
 Now that we've got our endpoint set up properly, we'll need to let Slack know what url to redirect to after a user installs our app using the button we've set up.
 
-In your app's settings page under **OAuth Settings** add the ngrok https url you used earlier for the **Request URL** and add `/thanks` and **Save Changes**.
+In your app's settings page under **OAuth Settings** add the ngrok https url you used earlier for the **Redirect URL** and add `/thanks` and **Save Changes**.
 
 ![redirect_url_thanks](https://cloud.githubusercontent.com/assets/4828352/20549300/d5aa215e-b0df-11e6-9796-3cb6fb1da7b4.png)
 

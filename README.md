@@ -15,13 +15,13 @@ packages you can install through [pip.](https://pip.pypa.io/en/stable/installing
 ###### Here's a list of what we'll need:
 
 - **[Python](https://www.python.org/downloads/)**, the programming language we're
-going to use.
+  going to use.
 - **[Pip](https://pip.pypa.io/en/stable/installing/)**, the Python package manager
-we'll use for installing packages we need.
+  we'll use for installing packages we need.
 - **[Virtualenv](https://virtualenv.pypa.io/en/latest/installation/)** or another
-tool to manage a virtual environment
+  tool to manage a virtual environment
 - **[Ngrok](https://ngrok.com/)**, an easy to use tunneling tool that supports HTTPS,
-which we'll use to connect our app to Slack over _teh interwebz._
+  which we'll use to connect our app to Slack over _teh interwebz._
 
 Once you've installed Python, pip, virtualenv and ngrok you can install all additional
 dependent libraries using pip and the `requirements.txt` file included in this
@@ -90,7 +90,7 @@ To start off right, go ahead and subscribe your bot to `message.channels` events
 
 After you've subscribed to all the events your app will need, make sure to **Save Changes**.
 
-![save_changes](https://cloud.githubusercontent.com/assets/4828352/20575405/fca754dc-b16d-11e6-880d-5eb8dd5d5196.png)
+![save_changes](https://cloud.githubusercontent.com/assets/6370924/21075115/f47ca400-bf01-11e6-9cf3-a59a34fdd270.png)
 
 ### App Credentials
 

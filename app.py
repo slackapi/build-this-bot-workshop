@@ -13,9 +13,31 @@ app = Flask(__name__)
 mybot = Bot()
 
 
+def action_handler(action_type):
+    """
+    Here we'll create a function to hand actions off to our bot.
+    """
+    pass
+
+
 def event_handler(event_type, slack_event):
     """
-    Here we'll create a function to hand events off to our bot.
+    A helper function that routes events from Slack to our Bot
+    by event type and subtype.
+    """
+    if event_type == "message":
+        users_text = slack_event["text"]
+        bot_mention_match = re.search(mybot.user_id, users_text)
+        hello_match = re.search('hello', users_text)
+        if bot_mention_match and hello_match:
+            return mybot.say_hello()
+    return "No event handler found for %s type events" % event_type
+
+
+@app.route("/after_button", methods=["GET", "POST"])
+def respond():
+    """
+    This route listens for incoming message button actions from Slack.
     """
     pass
 
@@ -25,7 +47,6 @@ def hears():
     """
     This route listens for incoming events from Slack.
     """
-    # When we receive an incoming request we parse it first
     response = json.loads(request.data)
     # ====== Slack URL Verification ====== #
     # In order to verify the url of our endpoint, Slack will send a challenge
@@ -42,11 +63,8 @@ def hears():
     if "event" in response:
         event_type = response["event"]["type"]
         slack_event = response["event"]
-        # Then handle the event by event_type and have your bot respond
         event_handler(event_type, slack_event)
         return make_response("Event HANDLED.", 200,)
-    # If our bot hears things that are not events we've subscribed to,
-    # send a quirky but helpful error response
     return make_response("WAT: These are not the droids you're \
                         looking for.", 404, {"X-Slack-No-Retry": 1})
 
@@ -59,15 +77,7 @@ def before_install():
 
 @app.route("/thanks", methods=["GET", "POST"])
 def thanks():
-    # Slack will send the temporary authorization code to this route after a
-    # user installs our app. Here is where you'll want to grab that code from
-    # the request's parameters.
     code = request.args.get("code")
-
-    # After that you'll want to exchange that code for an OAuth token using
-    # the Slack API endpoint `oauth.access`
-    # Now that we have a classy new Bot Class, let's build and use an auth
-    # method for authentication.
     mybot.auth(code)
     return render_template("thanks.html")
 

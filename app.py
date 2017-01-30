@@ -53,7 +53,8 @@ def hears():
 
 @app.route("/install", methods=["GET"])
 def before_install():
-    return render_template("install.html")
+    client_id = mybot.oauth["client_id"]
+    return render_template("install.html", client_id=client_id)
 
 
 @app.route("/thanks", methods=["GET", "POST"])

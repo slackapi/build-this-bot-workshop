@@ -6,10 +6,6 @@ If you open up this branch's [bot.py](bot.py) file you'll find some changes. Now
 
 We can store bits of information we'll want to access later as attributes on the bot object and actions we want our bot to take as methods.
 
-### Init Your Bot's Identity
-
-In the `__init__` function of the Bot class, which (as the name suggests) initializes the bot, we're giving our bot a touch of identity. Feel free to change the name and emoji here!
-
 Instead of importing the `python-slackclient` library in our `app.py` file like we did before, we'll import it into this file and access the `SlackClient` through an attribute on our bot. This makes it easier to handle OAuth since our bot object's attributes can be accessed in the other places it will live, such as the `app.py` file.
 
 ### Teach Bot How to Auth
@@ -38,7 +34,7 @@ If you peek on over at `app.py` again you'll see we've updated your `/thanks` ro
 
 Now that we've been authorized, let's teach our bot to respond to users who want to say hello!
 
-Earlier ,we subscribed to the Slack Events API endpoint called [message.channels](https://api.slack.com/events/message.channels). We'll listen for these events, check to see if anyone is saying hello to our bot, and then build a method on our Bot class to respond.
+Earlier, we subscribed to the Slack Events API endpoint called [message.channels](https://api.slack.com/events/message.channels). We'll listen for these events, check to see if anyone is saying hello to our bot, and then build a method on our Bot class to respond.
 
 ### Event Handlers
 
@@ -63,30 +59,26 @@ def event_handler(event_type, slack_event):
         # using regex, search for 'hello' in the users' text
         hello_match = re.search('hello', users_text)
         if bot_mention_match and hello_match:
-            # identify who said hello
-            user_id = slack_event["user"]
             # and have your bot respond
-            mybot.say_hello(user_id)
+            mybot.say_hello()
 ```
 
 ### Bot Response Methods
 
 Once `app.py` holds a function to handle the `message` events we want our bot to respond to, we'll need to build a method on our `Bot` class to respond.
 
-In `bot.py` you'll see we've started a method called `say_hello` to respond to a user's message in the `#general` channel. Since we already know that we want to say hello at this point, what we'll need to do is get the `user_id` that we've passed as a parameter and build a call to the Slack API's `chat.postMessage` endpoint.
+In `bot.py` you'll see we've started a method called `say_hello` to respond to a user's message in the `#general` channel. At this point we'll need to call to the Slack API's `chat.postMessage` endpoint to send our response.
 
 It should look something like this:
 
 _bot.py_
 ```python
-def say_hello(self, user_id):
+def say_hello(self):
     """ A method to respond to a user who says hello. """
-    hello_response = "Oh hi there, <@%s>" % user_id
+    hello_response = "I want to live! Please build me."
     self.client.api_call("chat.postMessage",
                          channel="#general",
-                         text=hello_response,
-                         username=self.name,
-                         icon_emoji=self.emoji)
+                         text=hello_response)
 ```
 
 Let's start our app back up again and test that it's working in the browser! Double check that your virtual environment is turned on, your secrets are exported to the environment and your ngrok tunnel is open.
@@ -103,13 +95,9 @@ Once you've installed your bot successfully, invite your bot to the `#general` c
 
 ## You Did It! :sparkles:
 
-You should have a working bot! If you're looking for ways to make your bot fancier, look into adding more interaction with [message buttons](https://api.slack.com/docs/message-buttons) or integrating some NLP with a lovely service like [api.ai.](https://api.ai/)
-
-We can't wait to see what you build next!
-
-Thanks for joining us!
+You should have a working bot! If you're looking for ways to make your bot fancier, we'll go over adding more interaction with [message buttons](https://api.slack.com/docs/message-buttons) and integrating some NLP with a lovely service like [api.ai](https://api.ai/) in the next two chapters.
 
 ---
 ###### Documentation Navigation
-**Next [Give Us Feedback!](https://goo.gl/forms/8FlqD5roZtCl7wx92)**  
+**Next [Chapter 4](./../docs/Chapter-4.md)**
 **Previous [Chapter 2](./../docs/Chapter-2.md)**  

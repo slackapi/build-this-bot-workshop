@@ -30,8 +30,10 @@ git checkout chapter-1
 If you'd like to follow along without any of the code, all of the documentation for each chapter is located in the `docs` folder in the `master` branch.
 
 * **[Chapter 1: Setting Things Up](docs/Chapter-1.md)** :point_left:  
-* [Chapter 2: App.py and OAuth](docs/Chapter-2.md)  
-* [Chapter 3: Handle Hello with Class](docs/Chapter-3.md)
+* [Chapter 2: App.py and OAuth](./../docs/Chapter-2.md)  
+* [Chapter 3: Handle Hello with Class](./../docs/Chapter-3.md)  
+* [Chapter 4: Message Buttons Magic](./../docs/Chapter-4.md)
+* [Chapter 5: ABCs of NLP](./../docs/Chapter-5.md)
 
 ## Further Reading and Getting Help
 

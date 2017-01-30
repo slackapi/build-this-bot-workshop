@@ -29,7 +29,7 @@ project, including [Flask](http://flask.pocoo.org/), a web development micro
 framework for Python and [python-slackclient](http://python-slackclient.readthedocs.io/en/latest/), a
 Slack client for Python. :snake:
 
-Next, you'll want to create a virtual environment to keep the dependencies for this project isolated from any other project you may be working on. You'll need to open a terminal or command prompt to enter these and the following commands.
+First, you'll want to create a virtual environment to keep the dependencies for this project isolated from any other project you may be working on. You'll need to open a terminal or command prompt to enter these and the following commands.
 
 Since we're using virtualenv you can run the following commands from the root of your
 project directory:
@@ -53,9 +53,7 @@ pip install -r requirements.txt
 
 ## Setting up Your Slack App
 
-You'll be given admin privileges on the workshop Slack team we've created. You can build bots on any team you're an admin of. :tada:
-
-First, we'll create a new Slack App.
+Now that we've got our local environment set up we'll need to create a new Slack App. :tada:
 
 ### Creating a New Slack App on [api.slack.com](https://api.slack.com/apps)
 
@@ -96,13 +94,15 @@ After you've subscribed to all the events your app will need, make sure to **Sav
 
 Let's revisit that tempting **Basic Information** page. Here you'll find your app's **Client ID**, **Client Secret** and **Verification Token** under the _App Credentials_ section.
 
-![app_credentials](https://cloud.githubusercontent.com/assets/4828352/20548888/198e2270-b0dc-11e6-9a92-5fe3842be4ba.png)
+![app_credentials](https://cloud.githubusercontent.com/assets/4828352/22839775/bd5af4f0-ef7f-11e6-84bf-33fe79b374f4.png)
 
-The Client ID is used to identify your app when requests are sent to Slack's API's. The Client Secret is used to validate your app's authenticity during the OAuth negotiation process. The Verification Token is used to verify requests sent by Slack and received by your server.
+The Client ID and Client Secret are used to validate your app's authenticity during the OAuth negotiation process. The Verification Token is used to verify requests sent by Slack and received by your server.
 
 Just like you wouldn't graffiti your email username and password at the bus stop, it's important to prevent your _App Credentials_ from becoming part of a public repository. To protect your app's secrets, this project exports these secrets to your local environment.
 
 If you're using Bash or Zsh and your virtual environment is activated, you can export your app's secrets like this:
+
+:warning: _Remember to have your virtualenv activated before exporting environment variables._
 
 ```bash
 export CLIENT_ID='XXXXXXXXXXX.xxxxxxxxxx'

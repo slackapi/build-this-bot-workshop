@@ -8,11 +8,18 @@ import json
 from flask import Flask, render_template, request, make_response
 from slackclient import SlackClient
 
-client_id = os.environ.get("CLIENT_ID")
-client_secret = os.environ.get("CLIENT_SECRET")
-
 app = Flask(__name__)
 client = SlackClient("")
+
+
+@app.before_first_request
+def before_first_request():
+    client_id = os.environ.get("CLIENT_ID")
+    client_secret = os.environ.get("CLIENT_SECRET")
+    if not client_id:
+        print "Can't find Client ID, did you set this env variable?"
+    if not client_secret:
+        print "Can't find Client Secret, did you set this env variable?"
 
 
 def event_handler(event_type, slack_event):

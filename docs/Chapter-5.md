@@ -6,7 +6,7 @@ Natural Language Processing is a field of computer science dedicated to programm
 
 NLP algorithms learn how to mimic natural human language by analyzing a sample of the sort of human language you're aiming to mimic, often called a training set. Just like you learned not to run around screaming in the classroom like you might on a playground as a kid, our bot's communication should be well suited to the context and purpose it serves. Selecting a training set that is an accurate representation of the tone you'd like to convey is often vitally important.
 
-There's a variety of great libraries and tools you can use to process natural language like [Natural Language Toolkit](http://www.nltk.org/), [scikit-learn](http://scikit-learn.org/stable/) or IMB Watson's [Natural Language Classifier](https://www.ibm.com/watson/developercloud/nl-classifier.html). We'll use an API service called [api.ai](api.ai) which will provide us with already trained algorithms and preloaded training sets so we can get a head start.
+There's a variety of great libraries and tools you can use to process natural language like [Natural Language Toolkit](http://www.nltk.org/), [scikit-learn](http://scikit-learn.org/stable/) or IBM Watson's [Natural Language Classifier](https://www.ibm.com/watson/developercloud/nl-classifier.html). We'll use an API service called [api.ai](api.ai) which will provide us with already trained algorithms and preloaded training sets so we can get a head start.
 
 ## Setting up api.ai
 

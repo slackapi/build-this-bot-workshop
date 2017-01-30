@@ -13,6 +13,19 @@ app = Flask(__name__)
 mybot = Bot()
 
 
+@app.before_first_request
+def before_first_request():
+    client_id = mybot.oauth.get("client_id")
+    client_secret = mybot.oauth.get("client_secret")
+    verification_token = mybot.verification
+    if not client_id:
+        print "Can't find Client ID, did you set this env variable?"
+    if not client_secret:
+        print "Can't find Client Secret, did you set this env variable?"
+    if not verification_token:
+        print "Can't find Verification Token, did you set this env variable?"
+
+
 def event_handler(event_type, slack_event):
     """
     Here we'll create a function to hand events off to our bot.
@@ -26,22 +39,22 @@ def hears():
     This route listens for incoming events from Slack.
     """
     # When we receive an incoming request we parse it first
-    response = json.loads(request.data)
+    incoming_request = json.loads(request.data)
     # ====== Slack URL Verification ====== #
     # In order to verify the url of our endpoint, Slack will send a challenge
     # token in a request and check for this token in the response our endpoint
     # sends back.
     #       For more info: https://api.slack.com/events/url_verification
-    if "challenge" in response:
-        return make_response(response["challenge"], 200, {"content_type":
-                                                          "application/json"})
+    if "challenge" in incoming_request:
+        return make_response(incoming_request["challenge"], 200,
+                             {"content_type": "application/json"})
 
     # ====== Process Incoming Events from Slack ======= #
     # Here we'll use the event_handler function above to route the events to
     # our Bot by event type.
-    if "event" in response:
-        event_type = response["event"]["type"]
-        slack_event = response["event"]
+    if "event" in incoming_request:
+        event_type = incoming_request["event"]["type"]
+        slack_event = incoming_request["event"]
         # Then handle the event by event_type and have your bot respond
         event_handler(event_type, slack_event)
         return make_response("Event HANDLED.", 200,)
@@ -53,7 +66,8 @@ def hears():
 
 @app.route("/install", methods=["GET"])
 def before_install():
-    return render_template("install.html")
+    client_id = mybot.oauth["client_id"]
+    return render_template("install.html", client_id=client_id)
 
 
 @app.route("/thanks", methods=["GET", "POST"])

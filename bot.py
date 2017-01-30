@@ -6,19 +6,11 @@ import os
 
 from slackclient import SlackClient
 
-# To remember which teams have authorized your app and what tokens are
-# associated with each team, we can store this information in memory on
-# as a global object. When your bot is out of development, it's best to
-# save this in a more persistant memory store.
-authed_teams = {}
-
 
 class Bot(object):
     """ Instanciates a Bot object to handle Slack interactions."""
     def __init__(self):
         super(Bot, self).__init__()
-        self.name = "mybot"
-        self.emoji = ":tada:"
         # When we instantiate a new bot object, we can access the app
         # credentials we set earlier in our local development environment.
         self.oauth = {"client_id": os.environ.get("CLIENT_ID"),

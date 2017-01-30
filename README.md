@@ -6,7 +6,7 @@ In this project directory, you'll find a file called [app.py](app.py). Because S
 
 Open that file and you'll see a basic Flask app with a few routes we've got set up.
 
-The first route called `/listening` is where Slack can communicate with our bot. Slack will need to verify that this is the correct route to talk to our bot. In order to do this, Slack will make a request to our `\listening` endpoint and send a `challenge` parameter that it will expect us to return back. In order for Slack to send this request we'll need expose our endpoint to the internet using HTTPS.
+The first route called `/listening` is where Slack can communicate with our bot. Slack will need to verify that this is the correct route to talk to our bot. In order to do this, Slack will make a request to our `/listening` endpoint and send a `challenge` parameter that it will expect us to return back. In order for Slack to send this request we'll need expose our endpoint to the internet using HTTPS.
 
 ### Tunnel with ngrok
 
@@ -82,13 +82,10 @@ At long last, you'll want to turn on the Events tap by navigating back to the **
 
 ## You Did It! :sparkles:
 
-You're authorized to move onto the next chapter! Since we've made some changes we'll want to keep in the next chapters, please follow the git workflow below closely:
+You're authorized to move onto the next chapter!
 
 ```bash
-git stash
 git checkout chapter-3
-git stash apply
-git checkout --ours README.md app.py
 ```
 
 ---

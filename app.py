@@ -13,11 +13,18 @@ app = Flask(__name__)
 mybot = Bot()
 
 
-def action_handler(action_type):
+def action_handler(action):
     """
-    Here we'll create a function to hand actions off to our bot.
+    A helper function that routes a user's message button actions
+    from Slack to our Bot by type of action taken.
     """
-    pass
+    if action == "mac":
+        return make_response(mybot.show_mac(), 200, {'Content-Type':
+                                                     'application/json'})
+    if action == "win":
+        return make_response(mybot.show_win(), 200, {'Content-Type':
+                                                     'application/json'})
+    return "No action handler found for %s type actions" % action
 
 
 def event_handler(event_type, slack_event):
@@ -28,6 +35,8 @@ def event_handler(event_type, slack_event):
     if event_type == "message":
         users_text = slack_event["text"]
         bot_mention_match = re.search(mybot.user_id, users_text)
+        # Change this helper function to check for intent in a user's text
+        # rather than a literal exact match.
         hello_match = re.search('hello', users_text)
         if bot_mention_match and hello_match:
             return mybot.say_hello()
@@ -39,7 +48,12 @@ def respond():
     """
     This route listens for incoming message button actions from Slack.
     """
-    pass
+    slack_payload = json.loads(request.form.get("payload"))
+    response_token = slack_payload.get("token")
+    if mybot.verification == response_token:
+        action_value = slack_payload["actions"][0].get("value")
+        return action_handler(action_value)
+    return make_response("Who dis? Verification tokens do not match.", 403,)
 
 
 @app.route("/listening", methods=["GET", "POST"])
@@ -49,17 +63,11 @@ def hears():
     """
     response = json.loads(request.data)
     # ====== Slack URL Verification ====== #
-    # In order to verify the url of our endpoint, Slack will send a challenge
-    # token in a request and check for this token in the response our endpoint
-    # sends back.
-    #       For more info: https://api.slack.com/events/url_verification
     if "challenge" in response:
         return make_response(response["challenge"], 200, {"content_type":
                                                           "application/json"})
 
     # ====== Process Incoming Events from Slack ======= #
-    # Here we'll use the event_handler function above to route the events to
-    # our Bot by event type.
     if "event" in response:
         event_type = response["event"]["type"]
         slack_event = response["event"]

@@ -1,244 +1,136 @@
-# Chapter 4: Message Buttons Magic
+# Chapter 5: ABCs of NLP
 
-Building a bot to respond to salutations is an awesome feat, but what if you want to add more excitement :sparkles: to the messages your bot can send? [Message buttons](https://api.slack.com/docs/message-buttons) are one way to make your bot's messages more interactive and interesting.
+### Understanding NLP
 
-## What's in a [message](https://api.slack.com/docs/messages)?
+Natural Language Processing is a field of computer science dedicated to programmatically understanding the ways actual humans communicate with each other. Anyone who's said or written something that another person has understood to mean something other than what you intended to communicate knows the complexity of natural human language. The field of NLP itself has made vast improvements in processing human language over the last few years, which is great for us bot builders!
 
-If you're having a conversation with your coworker in a conference room in the real world, there's a lot of information that goes into making it happen. Slack Messages are very similar. You'll need to know *where* the message is being sent, *to whom* it's being sent and *what* you want to say.
+NLP algorithms learn how to mimic natural human language by analyzing a sample of the sort of human language you're aiming to mimic, often called a training set. Just like you learned not to run around screaming in the classroom like you might on a playground as a kid, our bot's communication should be well suited to the context and purpose it serves. Selecting a training set that is an accurate representation of the tone you'd like to convey is often vitally important.
 
-Slack uses JSON to communicate all the information about each message sent between users on Slack. Our app can use this context to be helpful at the right times, in the right places and in the most appropriate ways. To learn more about formatting messages in Slack, you can find [helpful documentation here.](https://api.slack.com/docs/message-formatting)
+There's a variety of great libraries and tools you can use to process natural language like [Natural Language Toolkit](http://www.nltk.org/), [scikit-learn](http://scikit-learn.org/stable/) or IMB Watson's [Natural Language Classifier](https://www.ibm.com/watson/developercloud/nl-classifier.html). We'll use an API service called [api.ai](api.ai) which will provide us with already trained algorithms and preloaded training sets so we can get a head start.
 
-Let's break down an example JSON message:
+## Setting up api.ai
 
-```JSON
-{
-    "channel": "#general",
-    "text": "I want to live, <@U123|bob>!",
-    "attachments": [{
-        "text": "Please build me."
-        }]
-}
+First, you'll need to create an account on [api.ai](api.ai) or log in if you've already signed up. Once you've registered and logged in, you'll want to create a new agent by clicking on the **Create Agent** tab on the top left navigation.
+
+Agents are used to organize the logic and context for different bots or apps. It will also serve as the connection between our app and the NLP service api.ai provides. This is where we fine tune the NLP service to our particular use case.
+
+The name for your agent should match the name of the app or bot you're creating it for. Add a description for your agent and leave the sample data field blank. This is where you can add extra training data to further customize the tone and understanding of your bot.
+
+We want our bot to be able to recognize the **intent** behind what a user is saying rather than strictly listening for exact matched words. In our example we want to recognize when a user intends to greet us, so we'll use api.ai's **Intents**.
+
+To add a new intent, select **Intents** from the top left navigation bar. Let's call this intent *Greet*.
+
+<img width="905" alt="create_greet_intent" src="https://cloud.githubusercontent.com/assets/4828352/22127929/0a35e304-de53-11e6-887d-8dfdc3006d8c.png">
+
+Once we've created a new intent we'll need to train our agent to recognize different phrases that have the same meaning. In the **User says** box type some different greeting phrases you'd like the bot to recognize.
+
+<img width="899" alt="greeting_phrases_training" src="https://cloud.githubusercontent.com/assets/4828352/22127833/8e1bbeba-de52-11e6-8a36-0f27c90801a8.png">
+
+Once you've added 3 to 5 different phrases, click the blue save button at the top and let's test our agent. Type a different greeting phrase into the test console on the right side of the page. If your agent is trained correctly it should recognize the intent like this:
+
+<img width="352" alt="salutations" src="https://cloud.githubusercontent.com/assets/4828352/22128296/aeb212da-de54-11e6-9f51-a877ff4906aa.png">
+
+If your agent is not recognizing the intent properly, don't fret! Simply add a few more phrases into the **User says** box and try again. Once your agent is sucessfully trained on recognizing a greeting, we'll need to wire it up to our bot.
+
+## Your Bot and Agent Become Best Friends
+
+Our Bot and Agent would work so well together if they just knew how to speak the same language. Luckily, api.ai has provided a SDK that speaks the same language our Bot speaks; Python! :snake:
+
+In the terminal window where you've been running the `app.py`, make sure your virtualenv is activated and install api.ai's Python SDK with this command:
+
+```bash
+pip install apiai
 ```
 
-The `"channel"` field points to where the message will be sent. If sending a message directly to a user through a DM, pass either the id of the user or the id of the DM channel to this field. It is a best practice to send the channel id in this field whenever possible.
+Next, we'll need to add our Agent's API key (called a Client Access Token in api.ai) to our environment.
+You can find your client access token by clicking the settings icon next to your agent's name in the main navigation header on the left hand side. Copy the **Client access token** Under the **API Keys** section.
 
-The `"text"` field contains the message's primary content. In our example you may have noticed the special characters `<@` and `>` when we mention the user in the content of our message. These characters will let us use @mentioning functionality to send a notification to the user.
+<img width="895" alt="apiai_test_api_keys" src="https://cloud.githubusercontent.com/assets/4828352/22130181/7531dc6a-de5f-11e6-9edc-7bd8d58be134.png">
 
-The `"attachments"` field allows our bot to send messages with even more context. In the  example above, we're attaching additional text.
+To export apiai's secret keys to your environment in bash:
 
-### [Message Attachments](https://api.slack.com/docs/message-attachments)
-
-Enrich your messages by adding a bit more style, clear formatting and actionable content by adding message attachments. Like a high-five, attachments are fun and exciting, but too many of them can be overwhelming and disrupt the collaborative workflows and conversations that happen within Slack. There's a 20 attachment limit per message. :raised_hands:
-
-Attachments are a list of objects containing information about each attachment you'd like to send with this message. One example of a message with attachments looks like this:
-
-<img width="359" alt="attachment" src="https://cloud.githubusercontent.com/assets/4828352/22161048/735c314e-defd-11e6-8bce-8532653a5ccb.png">
-
-The JSON for this message looks like this:
-
-```JSON
-{
-    "text": "I am a test message",
-    "attachments": [
-        {
-            "text": "And here's an attachment!",
-            "color": "#FFAA99"
-        }
-    ]
-}
+```bash
+export CLIENT_ACCESS_TOKEN='123xxx45xx6789'
 ```
 
-Message buttons are a type of attachment. To use buttons in your messages, include an array called `"actions"` with your attachments, with one object for each button. For example, if we want to ask a user what operating system they are using, it might look like this:
+If you've got a Windows machine, use:
 
-<img width="423" alt="buttons" src="https://cloud.githubusercontent.com/assets/4828352/22161152/05128174-defe-11e6-9385-84abf83fbcf1.png">
-
-Here's what that would look like in JSON:
-
-```JSON
-{
-    "text": "I want to live! Please build me.",
-    "attachments": [
-        {
-            "pretext": "I'll tell you how to set up your system.:robot_face:",
-            "text": "What operating system are you using?",
-            "callback_id": "os",
-            "color": "#3AA3E3",
-            "attachment_type": "default",
-            "actions": [
-                {
-                    "name": "mac",
-                    "text": ":apple: Mac",
-                    "type": "button",
-                    "value": "mac"
-                },
-                {
-                    "name": "windows",
-                    "text": ":fax: Windows",
-                    "type": "button",
-                    "value": "win"
-                }
-            ]
-        }
-    ]
-}
+```bash
+set CLIENT_ACCESS_TOKEN='123xxx45xx6789'
 ```
 
-Let's add this to our bot to say hello!
+Once we've got this connection set up we'll need to alter our Bot's code and teach it how to ask the Agent for some help.
+
+### Teach Your Bot To Ask For Help
+
+If you open up `bot.py` you'll see some changes to the Bot class. At the top, we've imported the api.ai library which we're using in the `__init__` function to give our bot object a `self.ai` attribute which stores an api.ai client that we'll use to communicate with the agent. It's like teaching our bot it's new agent friend's phone number.
+
+We'll need to use this attribute to build a method to `try_to_understand` the incoming text from a user, like phoning a friend to ask for help. Let's finish building the method we've started for you.
 
 _bot.py_
 ```python
-def say_hello(self):
+def try_to_understand(self, users_text):
     """
-    A method to ask workshop attendees to build this bot. When a user clicks
-    the button for their operating system, the bot should display the set-up
-    instructions for that operating system.
+    A method to query api.ai's NLP algorithm and help our bot understand a
+    broader range of language.
+    Returns the intent matched from the query
     """
-    hello_message = "I want to live! Please build me."
-    message_attachments = [
-        {
-            "pretext": "I'll tell you how to set up your system. :robot_face:",
-            "text": "What operating system are you using?",
-            "callback_id": "os",
-            "color": "#3AA3E3",
-            "attachment_type": "default",
-            "actions": [
-                {
-                    "name": "mac",
-                    "text": ":apple: Mac",
-                    "type": "button",
-                    "value": "mac"
-                },
-                {
-                    "name": "windows",
-                    "text": ":fax: Windows",
-                    "type": "button",
-                    "value": "win"
-                }
-            ]
-        }
-    ]
-    self.client.api_call("chat.postMessage",
-                         channel="#general",
-                         text=hello_message,
-                         attachments=json.dumps(message_attachments))
+    # first we create a properly formatted http request to send to api.ai
+    ai_request = self.ai.text_request()
+    # then we set the user's text as the query we want to check for intent
+    ai_request.query = users_text
+    # get the response from the query
+    ai_response = ai_request.getresponse()
+    # parse the json into a dictionary
+    ai_response_dict = json.loads(ai_response.read())
+    # get the name of the intent that the agent has matched
+    intent = ai_response_dict["result"]["metadata"].get("intentName")
+    return intent
 ```
 
-With our virtualenv on and prepped with our app's secrets, we can fire up our app again to test our handiwork. Once you've got the app started locally, your ngrok tunnel is started and your **Request URL** and **Redirect URL** are updated, you'll need to reinstall your app using the `/install` endpoint.
+When the api.ai agent does not recognize the intents you've trained it to recognize it will return a _default fallback intent_.
+We can use this new ability to recognize the intended meaning in a user's text to appropriately respond.
 
-Then `/invite @yourbotname` to #general and say "hello @yourbotname !" to test it out!
+### Handle Events with Intents
 
-## Life after Button Pressing
-
-Who can resist a good button click? You may have noticed your buttons don't do anything. Like asking a kid to drive to the store and pick up some milk, our bot doesn't know how to handle what we're asking it to do.
-
-### Interactive Message Request and Response URLs
-
-When a user clicks on a button you've attached to your message, Slack sends a request with some JSON to a url you specify in the **Interactive Messages** section of your **App Settings** page.
-
-Let's create a route in `app.py` called `/after_button` that will listen for interactive message requests from Slack.
+To make use of our bot's new skillz, let's update the routing layer of our application. Specifically, we'll need to alter the `event_handler` helper method in _app.py_.
 
 _app.py_
 ```python
-@app.route("/after_button", methods=["GET", "POST"])
-def respond():
+def event_handler(event_type, slack_event):
     """
-    This route listens for incoming message button actions from Slack.
+    A helper function that routes events from Slack to our Bot
+    by event type and subtype.
     """
-    slack_payload = json.loads(request.form.get("payload"))
-    response_token = slack_payload.get("token")
-    # check that the verification token is correct
-    if mybot.verification == response_token:
-        # get the value of the button press
-        action_value = slack_payload["actions"][0].get("value")
-        # handle the action
-        return action_handler(action_value)
-    return make_response("Verification tokens do not match.", 403,)
+    if event_type == "message":
+        users_text = slack_event["text"]
+        bot_mention_match = re.search(mybot.user_id, users_text)
+        # Instead of using regex to match the work exactly, we'll send
+        # the user's text through apiai's NLP algorithm to see if it matches
+        # the intended message we're looking for
+        user_intent = mybot.try_to_understand(users_text)
+        # if the user's intent matches the Greet intent
+        if bot_mention_match and user_intent == "Greet":
+            # then say hello!
+            return mybot.say_hello()
+    return "No event handler found for %s type events" % event_type
 ```
 
-Now that we've built an endpoint to receive these events, we can append that to the end of our ngrok url and add it to the **Request URL** form in the **Interactive Messages** section of your **App Settings** page.
+Once you've updated this code, you can test it out.
 
-<img width="632" alt="interactive_message__request_url" src="https://cloud.githubusercontent.com/assets/4828352/21608143/a4e63d20-d1b2-11e6-99db-146dc835bb94.png">
+As a reminder, you'll want to make sure your virtualenv is activated, your secrets are exported to your environment and your ngrok tunnel is on. If you've restarted your ngrok tunnel, you'll also need to update the the https urls in your Slack app's settings page (including **Redirect URL** on **OAuth & Permissions** tab, **Request URL** on **Interactive Messages** tab, and **Request URL** on **Events Subscriptions** tab).
 
-### Action Handlers
+After that, start your local server with `python app.py` and open [http://localhost:5000/install](http://localhost:5000/install) in your favorite web browser and follow the button clicking magic to install your newly educated bot the workshop team for testing.
 
-Next we'll need to build the `action_handler` helper function, like we did for handling incoming events. When you open `app.py` you'll see we've started this helper for you.
-
-Once Slack sends a JSON payload of the action the user took to your endpoint, you'll have 3 seconds to respond to the request. In our example, we'll return a response right away. You can respond to the user's action using the `response_url` parameter of the JSON payload sent by Slack to respond up to 5 times over 30 minutes.
-
-_app.py_
-```python
-def action_handler(action):
-    """
-    A helper function that routes a user's message button actions
-    from Slack to our Bot by type of action taken.
-    """
-    if action == "mac":
-        return make_response(mybot.show_mac(), 200, {'Content-Type':
-        'application/json'})
-    if action == "win":
-        return make_response(mybot.show_win(), 200, {'Content-Type':
-        'application/json'})
-    return "No action handler found for %s type actions" % action
-```
-
-### Bot Response Methods
-
-Now that we've laid the foundation for our bot to respond to the actions a user can take with message buttons, we should give our bot something new to say.
-
-Our bot wants to help you. Once a user tells our bot what operating system they are running, it should give that user instructions on how to build the bot within that operating system.
-
-We've written a bot method for responding with instructions for setting up a Mac operating system called `show_mac`. Let's show those Windows users some :hearts: and write a `show_win` method.
-
-This is what the message will look like:
-![windows_message](https://cloud.githubusercontent.com/assets/4828352/22262009/00d13b68-e224-11e6-9c3b-7fae7f481713.png)
-
-_bot.py_
-```python
-def show_win(self):
-    message = {
-        "as_user": False,
-        "replace_original": False,
-        "response_type": "ephemeral",
-        "text": ":fax: *Windows OS*:\n Here's some helpful tips for "
-        "setting up the requirements you'll need for this workshop:",
-        "attachments": [{
-            "mrkdwn_in": ["text", "pretext"],
-            "text": "*Python 2.7 and Pip*:\n_Check to see if you have "
-            "Python on your system:_\n```python --version```\n_Download "
-            "link:_\nhttps://www.python.org/ftp/python/2.7.12/python-2.7.1"
-            "2.msi\n_Make sure to tick  `Add Python.exe to PATH` when "
-            "installing Python for Windows._\n_If that doesn't add it to "
-            "the path after installation, run this command:_\n```c:\pyth"
-            "on27\\tools\scripts\win_add2path.py```\n_After downloading "
-            "Python, you must upgrade your version of Pip:_\n```python "
-            "-m pip install -U pip```\n*Virtualenv*:\n_Check to see if "
-            "you have virtualenv on your system and install it if you "
-            "don't have it:_\n```virtualenv --version\npip install "
-            "virtualenv```\n*Ngrok:*\n_Check to see if you have ngrok on "
-            "your system:_\n```ngrok --version```\n_Download "
-            "Link:_\nhttps://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable"
-            "-darwin-amd64.zip\nTo unzip on Windows, just double click "
-            "ngrok.zip",
-            "footer": "Slack API: Build this Bot Workshop",
-            "footer_icon": "https://platform.slack-edge.com/img/default"
-            "_application_icon.png"
-        }]}
-    return json.dumps(message)
-```
-
-At this point, you can test out your Bot by installing it on your team, inviting it to the #general channel and saying hello.
-
-Go ahead, give those message buttons a whirl!
+Once your app is installed, try out various ways to say hello to your bot! (But don't forget to @mention it's name!)
 
 ## You Did It! :sparkles:
 
-Not satisfied with the intelligence of your bot? In the next chapter we'll teach your bot some natural language processing with API.AI.
+We can't wait to see what you build next!
 
-```bash
-git checkout chapter-5
-```
+Thanks for joining us!
 
 ---
 ###### Documentation Navigation
-**Next [Chapter 5](docs/Chapter-5.md)**  
-**Previous [Chapter 3](docs/Chapter-3.md)**  
+**Next [Give Us Feedback!](https://goo.gl/forms/8FlqD5roZtCl7wx92)**  
+**Previous [Chapter 4](docs/Chapter-4.md)**

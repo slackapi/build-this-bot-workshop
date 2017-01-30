@@ -79,14 +79,7 @@ It should look something like this:
 
 _bot.py_
 ```python
-def say_hello(self, user_id):
-    """ A method to respond to a user who says hello. """
-    hello_response = "Oh hi there, <@%s>" % user_id
-    self.client.api_call("chat.postMessage",
-                         channel="#general",
-                         text=hello_response,
-                         username=self.name,
-                         icon_emoji=self.emoji)
+check
 ```
 
 Let's start our app back up again and test that it's working in the browser! Double check that your virtual environment is turned on, your secrets are exported to the environment and your ngrok tunnel is open.

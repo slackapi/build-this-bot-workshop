@@ -17,7 +17,7 @@ python app.py
 ```
 ![start_appy](https://cloud.githubusercontent.com/assets/4828352/20549064/cad48f8c-b0dd-11e6-8a85-25bff2815d2e.png)
 
-Check our your shiny app running locally in a browser by navigating to the  [/install](http://localhost:5000/install) endpoint we started. :boom:
+Check our your shiny app is running locally in a browser by navigating to   [localhost:5000/install](http://localhost:5000/install). :boom:
 
 Since you've already got ngrok installed, in another terminal window, open up an ngrok tunnel for the port your Flask app will be served on locally.
 
@@ -26,7 +26,11 @@ ngrok http 5000
 ```
 ![start_ngrok_https](https://cloud.githubusercontent.com/assets/4828352/20549065/ceb8f7b4-b0dd-11e6-8946-119e50518781.png)
 
-Your terminal output should show both an http and https url ending in `ngrok.io`. Copy the **https** url and navigate in your browser to the **Events Subscriptions** tab in your app's settings page. In the **Request URL** form, paste the ngrok url and add `/listening` to the end. Making sure the **Enable Events** button is turned on, you should see a green notification that your URL has been validated. :tada:
+Your terminal output should show both an http and https url ending in `ngrok.io`.
+
+:warning: _Now is a good time to double check your ngrok tunnel is working properly by visiting **your_ngrok_URL.ngrok.io/install** in a web browser._
+
+Copy the **https** ngrok url, go to  https://api.slack.com/apps, click on your app and open the **Events Subscriptions** tab. In the **Request URL** form, paste `your_ngrok_URL.ngrok.io/listening`. After checking that the **Enable Events** button is turned on, you should see a green notification that your URL has been validated. :tada:
 
 ![request_url](https://cloud.githubusercontent.com/assets/4828352/20549180/e7d1f808-b0de-11e6-9aba-d05c34c3c4b7.png)
 

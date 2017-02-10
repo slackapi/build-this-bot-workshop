@@ -29,9 +29,8 @@ class Bot(object):
         """
         pass
 
-    def say_hello(self, user_id):
+    def say_hello(self):
         """
-        Here we'll create a method to open a DM with a user by their user ID
-        so our Bot can say hello!
+        Here we'll create a method to respond when a user says hello to our bot
         """
         pass

@@ -31,6 +31,6 @@ class Bot(object):
 
     def say_hello(self):
         """
-        Here we'll create a method to respond when a user says hello to our bot
+        Here we'll create a method to respond when a user says hello
         """
         pass

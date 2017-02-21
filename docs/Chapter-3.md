@@ -6,10 +6,6 @@ If you open up this branch's [bot.py](bot.py) file you'll find some changes. Now
 
 We can store bits of information we'll want to access later as attributes on the bot object and actions we want our bot to take as methods.
 
-### Init Your Bot's Identity
-
-In the `__init__` function of the Bot class, which (as the name suggests) initializes the bot, we're giving our bot a touch of identity. Feel free to change the name and emoji here!
-
 Instead of importing the `python-slackclient` library in our `app.py` file like we did before, we'll import it into this file and access the `SlackClient` through an attribute on our bot. This makes it easier to handle OAuth since our bot object's attributes can be accessed in the other places it will live, such as the `app.py` file.
 
 ### Teach Bot How to Auth
@@ -22,14 +18,14 @@ After we've authorized, we'll reconnect to the Slack Client so we can start to h
 
 _bot.py_
 ```python
-def auth(self, code):
-    auth_response = self.client.api_call("oauth.access",
-                                         client_id=self.oauth['client_id'],
-                                         client_secret=self.oauth['client_secret'],
-                                         code=code)
-    # We'll save the bot_user_id to check incoming messages mentioning our bot
-    self.bot_user_id = auth_response["bot"]["bot_user_id"]
-    self.client = SlackClient(auth_response["bot"]["bot_access_token"])
+    def auth(self, code):
+        auth_response = self.client.api_call("oauth.access",
+                                             client_id=self.oauth['client_id'],
+                                             client_secret=self.oauth['client_secret'],
+                                             code=code)
+        # We'll save the bot_user_id to check incoming messages mentioning our bot
+        self.bot_user_id = auth_response["bot"]["bot_user_id"]
+        self.client = SlackClient(auth_response["bot"]["bot_access_token"])
 ```
 
 If you peek on over at `app.py` again you'll see we've updated your `/thanks` route to call your bot object's shiny new `auth` method.
@@ -38,48 +34,49 @@ If you peek on over at `app.py` again you'll see we've updated your `/thanks` ro
 
 Now that we've been authorized, let's teach our bot to respond to users who want to say hello!
 
-Earlier ,we subscribed to the Slack Events API endpoint called [message.channels](https://api.slack.com/events/message.channels). We'll listen for these events, check to see if anyone is saying hello to our bot, and then build a method on our Bot class to respond.
+Earlier, we subscribed to the Slack Events API endpoint called [message.im](https://api.slack.com/events/message.im). We'll listen for these events, check to see if anyone is saying hello to our bot in a DM, and then build a method on our Bot class to respond.
 
 ### Event Handlers
 
-Back over in the `app.py` file you'll see we've started a function for you called `event_handler` which takes two parameters; `event_type` and `slack_event`. Here you'll need to write a function to parse the HTTP response Slack will send to your endpoint when your app receives a `slack_event`.
+Back over in the `app.py` file you'll see we've started a function for you called `handle_message` which uses the [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api). Here you'll need to write a function to check that the `event_data` sent to your app's endpoint from Slack contains the word "hello" and then respond to the user with the bot method `say_hello` that we'll build a little later.
 
-Since we only want our bot to say hello when someone says hello to us first, we'll need to look at the `text` field in the `slack_event` response and only call our Bot's `say_hello` response method if we see our Bot's name and the word "hello".
+Since we only want our bot to say hello when someone says hello to us first, we'll need to look at the `text` field in the `event_data` sent from Slack and only call our Bot's `say_hello` response method if we see the word "hello".
 
 Here's one way to do that:
 
 _app.py_
 ```python
-def event_handler(event_type, slack_event):
-    """
-    A helper function that routes events from Slack to our Bot
-    by event type and subtype.
-    """
-    if event_type == "message":
-        # grab the users' text to search
-        users_text = slack_event["text"]
-        # using regex, search for your bot's user id in the users' text
-        bot_mention_match = re.search(mybot.bot_user_id, users_text)
-        # using regex, search for 'hello' in the users' text
-        hello_match = re.search('hello', users_text)
-        if bot_mention_match and hello_match:
-            # identify who said hello
-            user_id = slack_event["user"]
-            # and have your bot respond
-            mybot.say_hello(user_id)
+# Using the Slack Events Adapter, when we receive a message event
+@events_adapter.on("message")
+def handle_message(event_data):
+    # Grab the message from the event payload
+    message = event_data["event"]
+    # if the user says hello
+    if "hello" in message.get('text'):
+        # have our bot respond to the message
+        mybot.say_hello(message)
+    else:
+        # otherwise help us find out what went wrong
+        print "This isn't the message we expected: \n%r\n" % message
 ```
 
 ### Bot Response Methods
 
-Once `app.py` holds a function to handle the `message` events we want our bot to respond to, we'll need to build a method on our `Bot` class to respond.
+Once `app.py` can handle the `message` events we want our bot to respond to, we'll need to build a method on our `Bot` class to respond.
 
-In `bot.py` you'll see we've started a method called `say_hello` to respond to a user's message in the `#general` channel. Since we already know that we want to say hello at this point, what we'll need to do is get the `user_id` that we've passed as a parameter and build a call to the Slack API's `chat.postMessage` endpoint.
+In `bot.py` you'll see we've started a method called `say_hello` to respond to a user's direct message. At this point we'll need to call to the Slack API's `chat.postMessage` endpoint to send our response.
 
 It should look something like this:
 
 _bot.py_
 ```python
-check
+    def say_hello(self, message):
+        """ A method to respond to a user who says hello. """
+        channel = message["channel"]
+        hello_response = "I want to live! :pray: Please build me <@%s>" % message["user"]
+        self.client.api_call("chat.postMessage",
+                             channel=channel,
+                             text=hello_response)
 ```
 
 Let's start our app back up again and test that it's working in the browser! Double check that your virtual environment is turned on, your secrets are exported to the environment and your ngrok tunnel is open.
@@ -92,17 +89,19 @@ Then navigate in your browser to the [/install](http://localhost:5000/install) e
 
 (HINT: if you're getting an ngrok error trying to install, you may need to restart ngrok and reset your app's **Request URL** under you App Setting's **Event Subscriptions** tab and your **Redirect URL** under the **OAuth & Permissions** tab.)
 
-Once you've installed your bot successfully, invite your bot to the `#general` channel in the workshop Slack team by typing `/invite @botname` and when you say `hello @botname` in that channel, your bot should respond!
+Once you've installed your bot successfully you can DM your bot, say "hello" and your bot should respond!
 
 ## You Did It! :sparkles:
 
-You should have a working bot! If you're looking for ways to make your bot fancier, look into adding more interaction with [message buttons](https://api.slack.com/docs/message-buttons) or integrating some NLP with a lovely service like [api.ai.](https://api.ai/)
+You should have a working bot! If you're looking for ways to make your bot fancier, we'll go over adding more interaction with [message buttons](https://api.slack.com/docs/message-buttons) and integrating some NLP with a lovely service like [api.ai](https://api.ai/) in the next two chapters.
 
-We can't wait to see what you build next!
 
-Thanks for joining us!
+```bash
+git stash
+git checkout chapter-4
+```
 
 ---
 ###### Documentation Navigation
-**Next [Give Us Feedback!](https://goo.gl/forms/8FlqD5roZtCl7wx92)**  
+**Next [Chapter 4](./../docs/Chapter-4.md)**
 **Previous [Chapter 2](./../docs/Chapter-2.md)**  

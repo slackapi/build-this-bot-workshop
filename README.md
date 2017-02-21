@@ -21,7 +21,7 @@ First you'll want to clone this project locally. This project is structured with
 
 At each step, feel free to ask questions in the _#help_ channel, or ask your neighbor if they can help! :raised_hands:
 
-To get started, checkout the first branch
+To get started, check out the first branch
 
 ```bash
 git checkout chapter-1
@@ -30,7 +30,7 @@ git checkout chapter-1
 If you'd like to follow along without any of the code, all of the documentation for each chapter is located in the `docs` folder in the `master` branch.
 
 * **[Chapter 1: Setting Things Up](docs/Chapter-1.md)** :point_left:  
-* [Chapter 2: App.py and OAuth](docs/Chapter-2.md)  
+* [Chapter 2: OMG OAuth](docs/Chapter-2.md)  
 * [Chapter 3: Handle Hello with Class](docs/Chapter-3.md)  
 * [Chapter 4: Message Buttons Magic](docs/Chapter-4.md)
 * [Chapter 5: ABCs of NLP](docs/Chapter-5.md)
@@ -41,15 +41,16 @@ If you'd like to follow along without any of the code, all of the documentation 
 
 ##### Slack Documentation
 
-* [Getting started with Slack apps](https://api.slack.com/slack-apps)  
-* [Slack Events API documentation](https://api.slack.com/events)  
-* [Slack Web API documentation](https://api.slack.com/web)
+* [Getting started with Slack apps](https://api.slack.com/slack-apps?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)  
+* [Slack Events API documentation](https://api.slack.com/events?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)  
+* [Slack Web API documentation](https://api.slack.com/web?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)
 
 ##### Documentation for Tools
 
 * [virtualenv](https://virtualenv.pypa.io/en/latest/userguide/)
 * [flask](http://flask.pocoo.org/)
 * [python-slackclient](http://python-slackclient.readthedocs.io/en/latest/)
+* [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api)
 * [ngrok](https://ngrok.com/docs)
 * [postman](https://www.getpostman.com/docs/)
 
@@ -59,9 +60,9 @@ Wondering what to do if you can't get this dang tutorial to work for you?
 The Slack Developer community is an awesome place to get help when you're confused
 or stuck. We have an excellent 'search first' culture and Slack is committed to
 improving our tutorials and documentation based on your feedback. If you've
-checked the [Slack API documentation](https://api.slack.com/), reached the end
+checked the [Slack API documentation](https://api.slack.com/?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop), reached the end
 of your google patience and found [StackOverflow](http://stackoverflow.com/questions/tagged/slack-api)
-to be unhelpful, try asking for help in the [Slack Developer Hangout](http://dev4slack.xoxco.com/)
+to be unhelpful, try asking for help in the [Bot Developer Hangout](http://dev4slack.xoxco.com/)
 Slack team.
 
 ### Feedback
@@ -70,3 +71,5 @@ I'd love to improve this project, so if you've got some ideas :bulb:, feedback
 :raising_hand: or praise :love_letter: please file an issue, submit a PR or
 reach out to me through [Github](https://github.com/karishay) or on
 [Twitter](https://twitter.com/karishannon)!
+
+If you want to keep up with Slack platform updates chat with us on [Twitter](https://twitter.com/slackapi).

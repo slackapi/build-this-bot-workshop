@@ -1,16 +1,55 @@
-# Chapter 2: App.py and OAuth
+# Chapter 2: OMG OAuth
 
-## Let's Make an [app.py](app.py)
+Don't you want your mom to be able to install and use your shiny new app on her Bot-Mom's Slack team? In order to have other teams and users authorize your app so they can use it, you'll need to implement an OAuth flow.
 
-In this project directory, you'll find a file called [app.py](app.py). Because Slack will be delivering events to your app's server, your server needs to be able to receive incoming HTTPS traffic from Slack. This file is where we'll create a Flask server to handle all incoming events from Slack.
+## Understanding [OAuth](https://api.slack.com/docs/oauth?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)
 
-Open that file and you'll see a basic Flask app with a few routes we've got set up.
+OAuth is a protocol that lets your app request authorization to private details in a user's Slack account without getting their password. Slack provides an [Add to Slack](https://api.slack.com/docs/slack-button) button to help users install your app onto their team.
 
-The first route called `/listening` is where Slack can communicate with our bot. Slack will need to verify that this is the correct route to talk to our bot. In order to do this, Slack will make a request to our `/listening` endpoint and send a `challenge` parameter that it will expect us to return back. In order for Slack to send this request we'll need expose our endpoint to the internet using HTTPS.
+When a user who wants to install your app on their Slack team arrives at your installation page, we'll present them with the [Add to Slack](https://api.slack.com/docs/slack-button) button. After giving in to the temptation of a good old fashioned button click, the user will be presented with a menu to select the Slack team they wish to grant your app access to and Slack will redirect the user to another endpoint in your app (in our case, a thank you page) and pass along a temporary authorization code. Your app can then exchange this temporary code for an OAuth token by making a request to Slack's `oauth.access` endpoint. You’ll want to store this token safely and securely, typically in a database, because you’ll use it to gain access to the Slack teams who have installed your app. In this workshop we’ll be storing this in memory for simplicity and urge you to follow [best practices for secure storage of OAuth tokens.](http://api.slack.com/docs/oauth-token-safety)
+
+![The OAuth Flow](https://a.slack-edge.com/bfaba/img/api/slack_oauth_flow_diagram@2x.png)
+
+## Building an OAuth Flow
+
+As it stands, our app doesn't have this redirect endpoint built, so let's build it. In `app.py` you'll see we've started a route for you called `/thanks`. This route is what the user will see after they've successfully installed our app.
+
+Before we return the template to the user, we'll want to grab the temporary authorization code Slack will send to us.
+
+_app.py_
+```python
+# add this code to the /thanks route
+code = request.args.get("code")
+```
+
+Then we'll need to exchange that code for an OAuth token. At the top of `app.py` we're importing [slackclient](http://python-slackclient.readthedocs.io/en/latest/) which we'll use to connect to Slack's APIs. After we create an instance of Flask, we create a `client` using this library. We'll use this to make the call to Slack's `oauth.access` endpoint to get our OAuth token. Python-slackclient's docs go over the OAuth flow in more detail [here](http://python-slackclient.readthedocs.io/en/latest/auth.html#the-oauth-flow).
+
+_app.py_
+```python
+# add this code to the /thanks route
+auth_response = client.api_call("oauth.access",
+                client_id=client_id,
+                client_secret=client_secret,
+                code=code)
+```
+
+At this point, we'll need to update our installation page with the [Add to Slack](https://api.slack.com/docs/slack-button) button.
+
+### Add to Slack Button
+
+This project has a [templates](templates) folder with an [install](templates/install.html) page started for you. This is where you should put an [**Add to Slack**](https://api.slack.com/docs/slack-button?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop) button! After navigating to the [slack-button page on api.slack.com](https://api.slack.com/docs/slack-button#add_the_slack_button?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop) under the **Add the Slack Button** section you'll see a widget that will generate code for an `Add to Slack` button for your app. Just select your app from the drop down and check only the `bot` scope, then copy the HTML code.
+
+:warning: _Make sure to select **only the Bot scope**_
+
+Back on your [install](templates/install.html) page you can replace the `<p>` tag placeholder with the code for the button you just copied.
+
+Open up that [/install](http://localhost:5000/install) endpoint again. :boom: Drop :microphone:
 
 ### Tunnel with ngrok
 
-At this point you'll want to get `app.py` running. With your virtual environment turned on and your secrets exported to the environment, go ahead and start your app:
+Now that we've got our endpoint set up properly, we'll need to let Slack know what url to redirect to after a user installs our app using the button we've set up.
+
+It's time to get `app.py` running. With your virtual environment turned on and your secrets exported to the environment, go ahead and start your app:
 
 ```bash
 python app.py
@@ -30,51 +69,11 @@ Your terminal output should show both an http and https url ending in `ngrok.io`
 
 :warning: _Now is a good time to double check your ngrok tunnel is working properly by visiting **your_ngrok_URL.ngrok.io/install** in a web browser._
 
-Copy the **https** ngrok url, go to  https://api.slack.com/apps, click on your app and open the **Events Subscriptions** tab. In the **Request URL** form, paste `your_ngrok_URL.ngrok.io/listening`. After checking that the **Enable Events** button is turned on, you should see a green notification that your URL has been validated. :tada:
+Copy the **https** ngrok url, go to  [https://api.slack.com/apps](https://api.slack.com/apps?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop), click on your app and open the **Events Subscriptions** tab. In the **Request URL** form, paste `https://your_ngrok_URL.ngrok.io/slack`. After checking that the **Enable Events** button is turned on, you should see a green notification that your URL has been validated. :tada:
 
 ![request_url](https://cloud.githubusercontent.com/assets/4828352/20549180/e7d1f808-b0de-11e6-9aba-d05c34c3c4b7.png)
 
 Once you **Save Changes** you've made on this page by clicking on the green button on the bottom of the page we can move on to the exciting and fun part...
-
-## Building an OAuth Flow
-
-Don't you want your mom to be able to install and use your shiny new app? In order to have other teams and users authorize your app so they can use it, you'll need to implement an OAuth flow.
-
-### Add to Slack Button
-
-This project has a [templates](templates) folder with an [install](templates/install.html) page started for you. This is where you should put an [**Add to Slack**](https://api.slack.com/docs/slack-button) button! After navigating to the [slack-button page on api.slack.com](https://api.slack.com/docs/slack-button#add_the_slack_button) under the **Add the Slack Button** section you'll see a widget that will generate code for an `Add to Slack` button for your app. Just select your app from the drop down and check only the `bot` scope, then copy the HTML code.
-
-Back on your [install](templates/install.html) page you can replace the `<p>` tag placeholder with the code for the button you just copied.
-
-Open up that [/install](http://localhost:5000/install) endpoint again. :boom: Drop :microphone:
-
-### Understanding [OAuth](https://api.slack.com/docs/oauth)
-
-When a user who wants to install your app on their Slack team pushes this button and authorizes the installation of your app on their Slack team, Slack will redirect the user to another endpoint in your app, along with a temporary authorization code. Your app can then exchange this temporary code for an OAuth token by making a request to Slack's `oauth.access` endpoint. You'll want to store this token safely and securely, typically in a database, because we'll use it to gain access to the Slack teams who have installed our app.
-
-As it stands, our app doesn't have this redirect endpoint built, so let's build it. In `app.py` you'll see we've started a route for you called `/thanks`. This route is what the user will see after they've successfully installed our app.
-
-Before we return the template to the user, we'll want to grab the temporary authorization code Slack will send to us.
-
-_app.py_
-```python
-code = request.args.get("code")
-```
-
-Then we'll need to exchange that code for an OAuth token. At the top of `app.py` we're importing [slackclient](http://python-slackclient.readthedocs.io/en/latest/) which we'll use to connect to Slack's APIs. After we create an instance of Flask, we create a `client` using this library. We'll use this to make the call to Slack's `oauth.access` endpoint to get our OAuth token. Python-slackclient's docs go over the OAuth flow in more detail [here](http://python-slackclient.readthedocs.io/en/latest/auth.html#the-oauth-flow).
-
-_app.py_
-```python
-auth_response = client.api_call("oauth.access",
-                client_id=client_id,
-                client_secret=client_secret,
-                code=code)
-```
-
-The `auth_response` object will contain a `user` token and a `bot` token. Let's ignore the `user` token and just use
-`auth_response["bot"]["bot_access_token"]` to make requests on behalf of our app's bot.
-
-Now that we've got our endpoint set up properly, we'll need to let Slack know what url to redirect to after a user installs our app using the button we've set up.
 
 In your app's settings page under **OAuth Settings** add the ngrok https url you used earlier for the **Redirect URL** and add `/thanks` and **Save Changes**.
 
@@ -89,6 +88,7 @@ At long last, you'll want to turn on the Events tap by navigating back to the **
 You're authorized to move onto the next chapter!
 
 ```bash
+git stash
 git checkout chapter-3
 ```
 

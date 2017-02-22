@@ -124,7 +124,9 @@ In this project directory, you'll find a file called [app.py](app.py). Slack wil
 
 When you open [app.py](app.py) you'll see that we've created an instance of _SlackEventAdapter_ called `events_adapter` and added a couple of routes to it's Flask server.
 
-The first route called `/install` will render an HTML template where users will eventually be able to install your app. To verify that this route is the correct route associated with our app, Slack will make a request to our `/install` endpoint and send a `challenge` parameter that it will expect us to return back. The Flask server in our [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api) will handle this verification for us. The second route called `/thanks` will return an HTML page to let our users know that our app has been sucessfully installed on their Slack team.
+To verify that our server is associated with our app, Slack will make a request to the `/slack` endpoint created by the Flask server in our [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api) by sending a `challenge` parameter that it will expect us to return back. The events adapter will handle this verification for us.
+
+First, we'll need to add an `/install` route that renders an HTML template where users will eventually be able to install your app. The second route called `/thanks` will return an HTML page to let our users know that our app has been sucessfully installed on their Slack team.
 
 Let's fire up our app and test that our Flask server is working properly. With your virtual environment turned on and your secrets exported to the environment, go ahead and start your app:
 

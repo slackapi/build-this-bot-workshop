@@ -9,9 +9,6 @@ from flask import render_template, request
 from slackclient import SlackClient
 from slackeventsapi import SlackEventAdapter
 
-# We'll store the SlackClient instances for each team in a
-# dictionary, so we can have multiple teams authed
-CLIENTS = {}
 
 client_id = os.environ.get("CLIENT_ID")
 client_secret = os.environ.get("CLIENT_SECRET")
@@ -46,12 +43,6 @@ def thanks():
     # After that you'll want to exchange that code for an OAuth token using
     # the Slack API endpoint `oauth.access`
 
-    # Grab the user's team info and token from the OAuth response
-    team_id = auth_response.get("team_id")
-    bot_token = auth_response["bot"].get("bot_access_token")
-
-    # Create a SlackClient for your bot to respond to use for Web API requests
-    CLIENTS[team_id] = SlackClient(bot_token)
     # Let your users know your app has been installed on their team
     return render_template("thanks.html")
 

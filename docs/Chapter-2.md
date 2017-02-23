@@ -41,9 +41,15 @@ This project has a [templates](templates) folder with an [install](templates/ins
 
 :warning: _Make sure to select **only the Bot scope**_
 
-Back on your [install](templates/install.html) page you can replace the `<p>` tag placeholder with the code for the button you just copied.
+Back on your [install](templates/install.html) page you can replace the `<p>` tag placeholder with the code for the button you just copied then fire up your python script and see your shiny new button.
+
+```bash
+python app.py
+```
 
 Open up that [/install](http://localhost:5000/install) endpoint again. :boom: Drop :microphone:
+
+:warning: _Clicking on this button will not work. Don't fret, we'll get it working a little later on._
 
 ### Tunnel with ngrok
 
@@ -71,7 +77,7 @@ Your terminal output should show both an http and https url ending in `ngrok.io`
 
 Copy the **https** ngrok url, go to  [https://api.slack.com/apps](https://api.slack.com/apps?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop), click on your app and open the **Events Subscriptions** tab. In the **Request URL** form, paste `https://your_ngrok_URL.ngrok.io/slack`. After checking that the **Enable Events** button is turned on, you should see a green notification that your URL has been validated. :tada:
 
-![request_url](https://cloud.githubusercontent.com/assets/4828352/20549180/e7d1f808-b0de-11e6-9aba-d05c34c3c4b7.png)
+![request_url](https://cloud.githubusercontent.com/assets/4828352/23273062/74e59ddc-f9b2-11e6-95a3-31b35a2cfffc.png)
 
 Once you **Save Changes** you've made on this page by clicking on the green button on the bottom of the page we can move on to the exciting and fun part...
 

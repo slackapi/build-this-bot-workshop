@@ -122,7 +122,7 @@ Our app will grab these secrets from our environment.
 
 In this project directory, you'll find a file called [app.py](app.py). Slack will be delivering events to your application securely, so your application server will need to be able to receive incoming HTTPS traffic. In  [app.py](app.py) we'll use the [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api) to create a Flask server to handle all incoming events from Slack. But first, you'll need a web page where people can install your bot onto their teams!
 
-When you open [app.py](app.py) you'll see that we've created an instance of _SlackEventAdapter_ called `events_adapter` and added a couple of routes to it's Flask server.
+When you open [app.py](app.py) you'll see that we've created an instance of _SlackEventAdapter_ called `events_adapter` and added a couple of routes to its Flask server.
 
 To verify that our server is associated with our app, Slack will make a request to the `/slack` endpoint created by the Flask server in our [Slack Events Adapter](https://github.com/slackapi/python-slack-events-api) by sending a `challenge` parameter that it will expect us to return back. The events adapter will handle this verification for us.
 

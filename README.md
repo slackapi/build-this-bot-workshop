@@ -1,12 +1,12 @@
 # Chapter 4: Message Buttons Magic
 
-Building a bot to respond to salutations is an awesome feat, but what if you want to add more excitement :sparkles: to the messages your bot can send? [Message buttons](https://api.slack.com/docs/message-buttons) are one way to make your bot's messages more interactive and interesting.
+Building a bot to respond to salutations is an awesome feat, but what if you want to add more excitement :sparkles: to the messages your bot can send? [Message buttons](https://api.slack.com/docs/message-buttons?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop) are one way to make your bot's messages more interactive and interesting.
 
-## What's in a [message](https://api.slack.com/docs/messages)?
+## What's in a [message](https://api.slack.com/docs/messages?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)?
 
 If you're having a conversation with your coworker in a conference room in the real world, there's a lot of information that goes into making it happen. Slack Messages are very similar. You'll need to know *where* the message is being sent, *to whom* it's being sent and *what* you want to say.
 
-Slack uses JSON to communicate all the information about each message sent between users on Slack. Our app can use this context to be helpful at the right times, in the right places and in the most appropriate ways. To learn more about formatting messages in Slack, you can find [helpful documentation here.](https://api.slack.com/docs/message-formatting)
+Slack uses JSON to communicate all the information about each message sent between users on Slack. Our app can use this context to be helpful at the right times, in the right places and in the most appropriate ways. To learn more about formatting messages in Slack, you can find [helpful documentation here.](https://api.slack.com/docs/message-formatting?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)
 
 Let's break down an example JSON message:
 
@@ -26,9 +26,9 @@ The `"text"` field contains the message's primary content. In our example you ma
 
 The `"attachments"` field allows our bot to send messages with even more context. In the  example above, we're attaching additional text.
 
-### [Message Attachments](https://api.slack.com/docs/message-attachments)
+### [Message Attachments](https://api.slack.com/docs/message-attachments?utm_source=events&utm_campaign=build-bot-workshop&utm_medium=workshop)
 
-Enrich your messages by adding a bit more style, clear formatting and actionable content by adding message attachments. Like a high-five, attachments are fun and exciting, but too many of them can be overwhelming and disrupt the collaborative workflows and conversations that happen within Slack. There's a 20 attachment limit per message. :raised_hands:
+Enrich your messages with a bit more style, clear formatting and actionable content by adding message attachments. Like a high-five, attachments are fun and exciting, but too many of them can be overwhelming and disrupt the collaborative workflows and conversations that happen within Slack. There's a 20 attachment limit per message. :raised_hands:
 
 Attachments are a list of objects containing information about each attachment you'd like to send with this message. One example of a message with attachments looks like this:
 
@@ -83,49 +83,50 @@ Here's what that would look like in JSON:
 }
 ```
 
-Let's add this to our bot to say hello!
+Let's add this to our bot's `say_hello` method!
 
 _bot.py_
 ```python
-def say_hello(self):
-    """
-    A method to ask workshop attendees to build this bot. When a user clicks
-    the button for their operating system, the bot should display the set-up
-    instructions for that operating system.
-    """
-    hello_message = "I want to live! Please build me."
-    message_attachments = [
-        {
-            "pretext": "I'll tell you how to set up your system. :robot_face:",
-            "text": "What operating system are you using?",
-            "callback_id": "os",
-            "color": "#3AA3E3",
-            "attachment_type": "default",
-            "actions": [
-                {
-                    "name": "mac",
-                    "text": ":apple: Mac",
-                    "type": "button",
-                    "value": "mac"
-                },
-                {
-                    "name": "windows",
-                    "text": ":fax: Windows",
-                    "type": "button",
-                    "value": "win"
-                }
-            ]
-        }
-    ]
-    self.client.api_call("chat.postMessage",
-                         channel="#general",
-                         text=hello_message,
-                         attachments=json.dumps(message_attachments))
+    def say_hello(self, message):
+        """
+        A method to ask workshop attendees to build this bot. When a user clicks
+        the button for their operating system, the bot should display the set-up
+        instructions for that operating system.
+        """
+        hello_message = "I want to live! Please build me."
+        message_attachments = [
+            {
+                "pretext": "I'll tell you how to set up your system. :robot_face:",
+                "text": "What operating system are you using?",
+                "callback_id": "os",
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "actions": [
+                    {
+                        "name": "mac",
+                        "text": ":apple: Mac",
+                        "type": "button",
+                        "value": "mac"
+                    },
+                    {
+                        "name": "windows",
+                        "text": ":fax: Windows",
+                        "type": "button",
+                        "value": "win"
+                    }
+                ]
+            }
+        ]
+        channel = message["channel"]
+        self.client.api_call("chat.postMessage",
+                             channel=channel,
+                             text=hello_message,
+                             attachments=json.dumps(message_attachments))
 ```
 
 With our virtualenv on and prepped with our app's secrets, we can fire up our app again to test our handiwork. Once you've got the app started locally, your ngrok tunnel is started and your **Request URL** and **Redirect URL** are updated, you'll need to reinstall your app using the `/install` endpoint.
 
-Then `/invite @yourbotname` to #general and say "hello @yourbotname !" to test it out!
+Then say "hello" to your bot in a DM to test it out!
 
 ## Life after Button Pressing
 
@@ -135,24 +136,20 @@ Who can resist a good button click? You may have noticed your buttons don't do a
 
 When a user clicks on a button you've attached to your message, Slack sends a request with some JSON to a url you specify in the **Interactive Messages** section of your **App Settings** page.
 
-Let's create a route in `app.py` called `/after_button` that will listen for interactive message requests from Slack.
+Let's create a route on `app.py`'s `events_adapter` server called `/after_button` that will listen for interactive message requests from Slack.
 
 _app.py_
 ```python
-@app.route("/after_button", methods=["GET", "POST"])
+@events_adapter.server.route("/after_button", methods=["GET", "POST"])
 def respond():
     """
     This route listens for incoming message button actions from Slack.
     """
     slack_payload = json.loads(request.form.get("payload"))
-    response_token = slack_payload.get("token")
-    # check that the verification token is correct
-    if mybot.verification == response_token:
-        # get the value of the button press
-        action_value = slack_payload["actions"][0].get("value")
-        # handle the action
-        return action_handler(action_value)
-    return make_response("Verification tokens do not match.", 403,)
+    # get the value of the button press
+    action_value = slack_payload["actions"][0].get("value")
+    # handle the action
+    return action_handler(action_value)
 ```
 
 Now that we've built an endpoint to receive these events, we can append that to the end of our ngrok url and add it to the **Request URL** form in the **Interactive Messages** section of your **App Settings** page.
@@ -161,24 +158,21 @@ Now that we've built an endpoint to receive these events, we can append that to 
 
 ### Action Handlers
 
-Next we'll need to build the `action_handler` helper function, like we did for handling incoming events. When you open `app.py` you'll see we've started this helper for you.
+Next we'll need to build an `action_handler` like we did for handling incoming events. When you open `app.py` you'll see we've started this for you.
 
 Once Slack sends a JSON payload of the action the user took to your endpoint, you'll have 3 seconds to respond to the request. In our example, we'll return a response right away. You can respond to the user's action using the `response_url` parameter of the JSON payload sent by Slack to respond up to 5 times over 30 minutes.
 
 _app.py_
 ```python
-def action_handler(action):
-    """
-    A helper function that routes a user's message button actions
-    from Slack to our Bot by type of action taken.
-    """
-    if action == "mac":
+@events_adapter.on("action")
+def action_handler(action_value):
+    if action_value == "mac":
         return make_response(mybot.show_mac(), 200, {'Content-Type':
-        'application/json'})
-    if action == "win":
+                                                     'application/json'})
+    if action_value == "win":
         return make_response(mybot.show_win(), 200, {'Content-Type':
-        'application/json'})
-    return "No action handler found for %s type actions" % action
+                                                     'application/json'})
+    return "No action handler found for %s type actions" % action_value
 ```
 
 ### Bot Response Methods
@@ -226,7 +220,7 @@ def show_win(self):
     return json.dumps(message)
 ```
 
-At this point, you can test out your Bot by installing it on your team, inviting it to the #general channel and saying hello.
+At this point, you can test out your Bot by installing it on your team and saying hello over DM.
 
 Go ahead, give those message buttons a whirl!
 
@@ -235,6 +229,7 @@ Go ahead, give those message buttons a whirl!
 Not satisfied with the intelligence of your bot? In the next chapter we'll teach your bot some natural language processing with API.AI.
 
 ```bash
+git stash
 git checkout chapter-5
 ```
 

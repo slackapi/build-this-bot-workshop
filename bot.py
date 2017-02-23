@@ -30,13 +30,20 @@ class Bot(object):
         self.user_id = auth_response["bot"]["bot_user_id"]
         self.client = SlackClient(auth_response["bot"]["bot_access_token"])
 
-    def say_hello(self):
-        """ A method to respond to a user who says hello. """
-        hello_response = "I want to live! Please build me."
+    def say_hello(self, message):
+        """
+        A method to ask workshop attendees to build this bot. When a user
+        clicks the button for their operating system, the bot should display
+        the set-up instructions for that operating system.
+        """
+        channel = message["channel"]
+        hello_message = "I want to live! Please build me."
         # Add message attachments here!
+
         self.client.api_call("chat.postMessage",
-                             channel="#general",
-                             text=hello_response)
+                             channel=channel,
+                             text=hello_message,
+                             attachments=json.dumps(message_attachments))
 
     def show_win(self):
         """

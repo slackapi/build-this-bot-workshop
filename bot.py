@@ -45,12 +45,13 @@ class Bot(object):
         """
         pass
 
-    def say_hello(self):
+    def say_hello(self, message):
         """
         A method to ask workshop attendees to build this bot. When a user
         clicks the button for their operating system, the bot should display
         the set-up instructions for that operating system.
         """
+        channel = message["channel"]
         hello_message = "I want to live! Please build me.\
                         \nI'll tell you how to set up your system.:robot_face:"
         message_attachments = [
@@ -76,7 +77,7 @@ class Bot(object):
             }
         ]
         self.client.api_call("chat.postMessage",
-                             channel="#general",
+                             channel=channel,
                              text=hello_message,
                              attachments=json.dumps(message_attachments))
 

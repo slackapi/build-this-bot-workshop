@@ -69,23 +69,23 @@ We'll need to use this attribute to build a method to `try_to_understand` the in
 
 _bot.py_
 ```python
-def try_to_understand(self, users_text):
-    """
-    A method to query api.ai's NLP algorithm and help our bot understand a
-    broader range of language.
-    Returns the intent matched from the query
-    """
-    # first we create a properly formatted http request to send to api.ai
-    ai_request = self.ai.text_request()
-    # then we set the user's text as the query we want to check for intent
-    ai_request.query = users_text
-    # get the response from the query
-    ai_response = ai_request.getresponse()
-    # parse the json into a dictionary
-    ai_response_dict = json.loads(ai_response.read())
-    # get the name of the intent that the agent has matched
-    intent = ai_response_dict["result"]["metadata"].get("intentName")
-    return intent
+    def try_to_understand(self, users_text):
+        """
+        A method to query api.ai's NLP algorithm and help our bot understand a
+        broader range of language.
+        Returns the intent matched from the query
+        """
+        # first we create a properly formatted http request to send to api.ai
+        ai_request = self.ai.text_request()
+        # then we set the user's text as the query we want to check for intent
+        ai_request.query = users_text
+        # get the response from the query
+        ai_response = ai_request.getresponse()
+        # parse the json into a dictionary
+        ai_response_dict = json.loads(ai_response.read())
+        # get the name of the intent that the agent has matched
+        intent = ai_response_dict["result"]["metadata"].get("intentName")
+        return intent
 ```
 
 When the api.ai agent does not recognize the intents you've trained it to recognize it will return a _default fallback intent_.
@@ -93,27 +93,23 @@ We can use this new ability to recognize the intended meaning in a user's text t
 
 ### Handle Events with Intents
 
-To make use of our bot's new skillz, let's update the routing layer of our application. Specifically, we'll need to alter the `event_handler` helper method in _app.py_.
+To make use of our bot's new skillz, let's update the routing layer of our application. Specifically, we'll need to alter the `event_handler` in _app.py_.
 
 _app.py_
 ```python
-def event_handler(event_type, slack_event):
-    """
-    A helper function that routes events from Slack to our Bot
-    by event type and subtype.
-    """
-    if event_type == "message":
-        users_text = slack_event["text"]
-        bot_mention_match = re.search(mybot.user_id, users_text)
-        # Instead of using regex to match the work exactly, we'll send
-        # the user's text through apiai's NLP algorithm to see if it matches
-        # the intended message we're looking for
-        user_intent = mybot.try_to_understand(users_text)
-        # if the user's intent matches the Greet intent
-        if bot_mention_match and user_intent == "Greet":
-            # then say hello!
-            return mybot.say_hello()
-    return "No event handler found for %s type events" % event_type
+@events_adapter.on("message")
+def handle_message(event_data):
+    message = event_data["event"]
+    users_text = message.get('text')
+    # Instead of matching a literal string, we'll send
+    # the user's text through apiai's NLP algorithm to see if it matches
+    # the intended message we're looking for
+    user_intent = mybot.try_to_understand(users_text)
+    # if the user's intent matches the Greet intent
+    if user_intent == "Greet":
+        # then say hello!
+        return mybot.say_hello(message)
+    print "This isn't the message we expected: \n%r\n" % message
 ```
 
 Once you've updated this code, you can test it out.
@@ -122,7 +118,7 @@ As a reminder, you'll want to make sure your virtualenv is activated, your secre
 
 After that, start your local server with `python app.py` and open [http://localhost:5000/install](http://localhost:5000/install) in your favorite web browser and follow the button clicking magic to install your newly educated bot the workshop team for testing.
 
-Once your app is installed, try out various ways to say hello to your bot! (But don't forget to @mention it's name!)
+Once your app is installed, try out various ways to say hello to your bot via DM!
 
 ## You Did It! :sparkles:
 

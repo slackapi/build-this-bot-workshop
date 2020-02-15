@@ -18,7 +18,7 @@ packages you can install through [pip.](https://pip.pypa.io/en/stable/installing
 going to use.
 - **[Pip](https://pip.pypa.io/en/stable/installing/)**, the Python package manager
 we'll use for installing packages we need.
-- **[Virtualenv](https://virtualenv.pypa.io/en/latest/installation/)** or another
+- **[Virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)** or another
 tool to manage a virtual environment
 - **[Ngrok](https://ngrok.com/)**, an easy to use tunneling tool that supports HTTPS,
 which we'll use to connect our app to Slack over _teh interwebz._
